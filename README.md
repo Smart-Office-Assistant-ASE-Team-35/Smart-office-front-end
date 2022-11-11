@@ -1,2 +1,2 @@
-# smart-office-front-end
-Front end team Smart office repository.
+# Smart-office-frontend
+Frontend team Smart office repository.
