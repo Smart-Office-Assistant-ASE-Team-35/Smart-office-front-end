@@ -1,1 +1,1 @@
-export const ApiPath = process.env.REACT_APP_MY_ENV_API;
+export const ApiPath = process.env.REACT_APP_SOCKET_ENDPOINT;

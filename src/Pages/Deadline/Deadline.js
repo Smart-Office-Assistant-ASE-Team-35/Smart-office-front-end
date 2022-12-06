@@ -14,12 +14,14 @@ import {
   getEventById,
   updateEventById,
 } from "../../Services/service.dashboard";
+import CustomLoader from "../ReUsable/CustomLoader";
 
-const TabWrap = styled("div")({
+export const TabWrap = styled("div")({
+  position: "relative",
   border: "1px solid #E7E7E7",
   borderRadius: "10px",
   padding: "0 24px",
-  height: "70vh",
+  height: "62vh",
   ".css-1h9z7r5-MuiButtonBase-root-MuiTab-root": {
     color: "#363537",
     fontStyle: "normal",
@@ -49,13 +51,25 @@ const TabWrap = styled("div")({
     padding: "20px 0",
     height: "calc(100% - 90px)",
     overflow: "auto",
+    scrollBehavior: "smooth",
+    "&::-webkit-scrollbar": {
+      width: "0.5em",
+      marginRight: "5px",
+    },
+    "&::-webkit-scrollbar-thumb": {
+      backgroundColor: "rgba(181,188,194,0.7)",
+      borderRadius: "10px",
+      "&:hover": {
+        backgroundColor: "rgba(181,188,194,0.9)",
+      },
+    },
   },
   ".css-8atqhb": {
     height: "100%",
   },
 });
 
-const deadlinePayload = {
+let deadlinePayload = {
   summary: "My first event!",
   location: "Hyderabad,India",
   description: "First event with nodeJS!",
@@ -83,6 +97,32 @@ const deadlinePayload = {
   },
   event_type: "Deadline",
   event_status: "Pending",
+  notified: "none",
+};
+
+export const TextInfo = ({ msg }) => {
+  return (
+    <>
+      <Grid
+        item
+        xs={12}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100%",
+        }}
+      >
+        <h3>{msg}</h3>
+      </Grid>
+    </>
+  );
+};
+
+export const getTime = (time) => {
+  return `${moment(time).format("h:mmA").toString()}, ${moment(time)
+    .format("D MMM YYYY")
+    .toString()}`;
 };
 
 function Deadline() {
@@ -92,15 +132,19 @@ function Deadline() {
     startTime: date,
     endTime: date,
     eventDate: date,
+    notifyTime: "none",
   };
-  const [open, setOpen] = useState(false);
   const [value, setValue] = useState(0);
+  const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState("");
+  const [loader, setLoader] = useState(false);
   const [allEvents, setAllEvents] = useState([]);
+  const [validation, setValidation] = useState(false);
   const [eventForm, setEventForm] = useState({ ..._eventForm });
 
   useEffect(() => {
     document.title = "Deadline";
+    setLoader(true);
     getTaskData();
   }, []);
 
@@ -120,7 +164,7 @@ function Deadline() {
         className="tabWrapper"
       >
         {value === index && (
-          <Grid container spacing={3}>
+          <Grid container spacing={3} style={{ height: "100%" }}>
             {children}
           </Grid>
         )}
@@ -144,10 +188,11 @@ function Deadline() {
 
   const getTaskData = async () => {
     let response = await getAllTask();
-    let _allEvents = response?.data?.events?.filter(
-      (data) => data.event_type === "Deadline"
+    let _allEvents = response?.data?.filter(
+      (data) => data?.event_type === "Deadline"
     );
     setAllEvents(_allEvents);
+    setLoader(false);
   };
 
   const handleEdit = async (id) => {
@@ -160,42 +205,57 @@ function Deadline() {
         eventName: event.summary,
         startTime: event.start.dateTime,
         endTime: event.end.dateTime,
+        eventDate: moment(event.start.dateTime)?.format("L"),
+        notifyTime: event.notified,
       });
+      if (event.event_status === "Delay") {
+        deadlinePayload = {
+          ...deadlinePayload,
+          event_status: event.event_status,
+        };
+      }
       handelOpen();
     }
   };
 
   const handelSubmit = async () => {
-    editId === ""
-      ? await createEventApi({
-          ...deadlinePayload,
-          summary: eventForm.eventName,
-          description: eventForm.eventName,
-          start: {
-            dateTime: eventForm.startTime,
-            timeZone: "Asia/Kolkata",
-          },
-          end: {
-            dateTime: eventForm.endTime,
-            timeZone: "Asia/Kolkata",
-          },
-        })
-      : await updateEventById(editId, {
-          ...deadlinePayload,
-          id: editId,
-          summary: eventForm.eventName,
-          description: eventForm.eventName,
-          start: {
-            dateTime: eventForm.startTime,
-            timeZone: "Asia/Kolkata",
-          },
-          end: {
-            dateTime: eventForm.endTime,
-            timeZone: "Asia/Kolkata",
-          },
-        });
-    handleClose();
-    getTaskData();
+    if (eventForm.eventName === "") {
+      setValidation(true);
+    } else {
+      setLoader(true);
+      let startTime = moment(eventForm.startTime).format("h:mm a").toString();
+      let endTime = moment(eventForm.endTime).format("h:mm a").toString();
+      let eventDate = moment(eventForm.eventDate).format("L").toString();
+      const _deadlinePayload = {
+        ...deadlinePayload,
+        summary: eventForm.eventName,
+        description: eventForm.eventName,
+        start: {
+          dateTime: moment(startTime + " " + eventDate).format(
+            "YYYY-MM-DDTHH:mm:ssZ"
+          ),
+          timeZone: "Asia/Kolkata",
+        },
+        end: {
+          dateTime: moment(endTime + " " + eventDate).format(
+            "YYYY-MM-DDTHH:mm:ssZ"
+          ),
+          timeZone: "Asia/Kolkata",
+        },
+        notified: eventForm.notifyTime,
+      };
+      editId === ""
+        ? await createEventApi({
+            ..._deadlinePayload,
+          })
+        : await updateEventById(editId, {
+            ..._deadlinePayload,
+            id: editId,
+          });
+      setEditId("");
+      handleClose();
+      getTaskData();
+    }
   };
 
   const handleDone = async (id) => {
@@ -222,6 +282,7 @@ function Deadline() {
   };
 
   const handleDelete = async (id) => {
+    setLoader(true);
     await deleteEventById(id);
     getTaskData();
   };
@@ -239,12 +300,6 @@ function Deadline() {
     setOpen(false);
   };
 
-  const getTime = (time) => {
-    return `${moment(time).format("h:mmA").toString()}, ${moment(time)
-      .format("D MMM YYYY")
-      .toString()}`;
-  };
-
   return (
     <>
       <CustomModel open={open} onClose={handleClose} modelTitle={"Deadlines"}>
@@ -252,6 +307,7 @@ function Deadline() {
           handelChange={handelChange}
           handelSubmit={handelSubmit}
           handleClose={handleClose}
+          validation={validation}
           eventForm={eventForm}
         />
       </CustomModel>
@@ -263,6 +319,7 @@ function Deadline() {
         handelOpen={handelOpen}
       />
       <TabWrap>
+        {loader ? <CustomLoader /> : ""}
         <Box sx={{ width: "100%" }}>
           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
             <Tabs
@@ -282,13 +339,21 @@ function Deadline() {
                 <Grid item xs={4} key={index}>
                   <EditTask
                     title={event.summary}
-                    time={getTime(event.start.dateTime)}
+                    notify={event.notified}
+                    time={getTime(event.end.dateTime)}
                     handleDone={() => handleDone(event._id)}
                     handleEdit={() => handleEdit(event._id)}
                     handleDelete={() => handleDelete(event._id)}
                   />
                 </Grid>
               ))}
+            {allEvents?.length &&
+            !allEvents?.filter((event) => event.event_status === "Pending")
+              ?.length ? (
+              <TextInfo msg={"No Task Check In Delay"} />
+            ) : (
+              ""
+            )}
           </TabPanel>
           <TabPanel value={value} index={1}>
             {allEvents
@@ -297,13 +362,21 @@ function Deadline() {
                 <Grid item xs={4} key={index}>
                   <EditTask
                     title={event.summary}
-                    time={getTime(event.start.dateTime)}
+                    notify={event.notified}
+                    time={getTime(event.end.dateTime)}
                     handleDone={() => handleDone(event._id)}
                     handleEdit={() => handleEdit(event._id)}
                     handleDelete={() => handleDelete(event._id)}
                   />
                 </Grid>
               ))}
+            {allEvents?.length &&
+            !allEvents?.filter((event) => event.event_status === "Delay")
+              ?.length ? (
+              <TextInfo msg={"No Task"} />
+            ) : (
+              ""
+            )}
           </TabPanel>
           <TabPanel value={value} index={2}>
             {allEvents
@@ -312,13 +385,18 @@ function Deadline() {
                 <Grid item xs={4} key={index}>
                   <EditTask
                     title={event.summary}
-                    time={getTime(event.start.dateTime)}
-                    handleDone={() => handleDone(event._id)}
-                    handleEdit={() => handleEdit(event._id)}
+                    time={getTime(event.end.dateTime)}
                     handleDelete={() => handleDelete(event._id)}
                   />
                 </Grid>
               ))}
+            {allEvents?.length &&
+            !allEvents?.filter((event) => event.event_status === "Done")
+              ?.length ? (
+              <TextInfo msg={"No Task"} />
+            ) : (
+              ""
+            )}
           </TabPanel>
         </Box>
       </TabWrap>

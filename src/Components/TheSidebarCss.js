@@ -1,13 +1,13 @@
 import { styled } from "@mui/material";
 
 export const SidebarWrap = styled("aside")({
-  height: "100vh",
+  height: "calc(100vh - 78px)",
   background: " #fff",
   maxWidth: "325px",
   width: "100%",
   borderRight : "1px solid #E7E7E7",
   ul: {
-    marginTop : "200px",
+    marginTop : "100px",
     li: {
       listStyle: "none",
       a: {

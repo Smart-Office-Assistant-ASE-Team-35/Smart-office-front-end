@@ -4,7 +4,7 @@ import { ApiPath } from "../views/api-path/secure_api";
 const secureAxios = axios.create({
   baseURL: ApiPath,
   headers: {
-    "Access-Control-Allow-Origin":"*"
+    "Access-Control-Allow-Origin": "*",
   },
 });
 

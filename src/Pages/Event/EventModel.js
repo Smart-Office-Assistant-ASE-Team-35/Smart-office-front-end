@@ -4,13 +4,33 @@ import {
   TimePicker,
   DesktopDatePicker,
 } from "@mui/x-date-pickers";
-import { FormControl, Grid, MenuItem, Select, TextField } from "@mui/material";
+import {
+  FormControl,
+  FormHelperText,
+  Grid,
+  MenuItem,
+  Select,
+  TextField,
+} from "@mui/material";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import CustomButton from "../ReUsable/CustomButton";
 import { ModelContainer } from "../Deadline/DeadlineModel";
 import { CustomInput, CustomLabel } from "../ReUsable/CustomFormControl";
+import moment from "moment";
 
-function EventModel({ handelChange, handelSubmit, handleClose, eventForm }) {
+const errorCss = {
+  color: "red",
+  position: "absolute",
+  bottom: "-20px",
+};
+
+function EventModel({
+  handelChange,
+  handelSubmit,
+  handleClose,
+  validation,
+  eventForm,
+}) {
   return (
     <ModelContainer>
       <Grid container spacing={3}>
@@ -26,6 +46,11 @@ function EventModel({ handelChange, handelSubmit, handleClose, eventForm }) {
                 handelChange("eventName", e.target.value);
               }}
             />
+            {eventForm.eventName === "" && validation && (
+              <FormHelperText style={errorCss}>
+                This is required!
+              </FormHelperText>
+            )}
           </FormControl>
         </Grid>
         <Grid item xs={6}>
@@ -70,6 +95,7 @@ function EventModel({ handelChange, handelSubmit, handleClose, eventForm }) {
                 id="event-date"
                 variant="outlined"
                 name="eventDate"
+                minDate={moment().toString()}
                 value={eventForm.eventDate}
                 placeholder="Choose date"
                 inputFormat="MM/DD/YYYY"
@@ -95,6 +121,11 @@ function EventModel({ handelChange, handelSubmit, handleClose, eventForm }) {
               <MenuItem value={"DailyRoutine"}>Daily Routine</MenuItem>
               <MenuItem value={"TempararyEvent"}>Temparary Event</MenuItem>
             </Select>
+            {eventForm.type === "" && validation && (
+              <FormHelperText style={errorCss}>
+                This is required!
+              </FormHelperText>
+            )}
           </FormControl>
         </Grid>
         {eventForm.type === "DailyRoutine" ? (
@@ -117,6 +148,11 @@ function EventModel({ handelChange, handelSubmit, handleClose, eventForm }) {
                 <MenuItem value={"MINUTELY"}>MINUTELY</MenuItem>
                 <MenuItem value={"SECONDLY"}>SECONDLY</MenuItem>
               </Select>
+              {eventForm.repeatFor === "" && validation && (
+                <FormHelperText style={errorCss}>
+                  This is required!
+                </FormHelperText>
+              )}
             </FormControl>
           </Grid>
         ) : (
@@ -140,6 +176,11 @@ function EventModel({ handelChange, handelSubmit, handleClose, eventForm }) {
                   renderInput={(params) => <TextField {...params} />}
                 />
               </LocalizationProvider>
+              {eventForm.repeatTil === "" && validation && (
+                <FormHelperText style={errorCss}>
+                  This is required!
+                </FormHelperText>
+              )}
             </FormControl>
           </Grid>
         ) : (

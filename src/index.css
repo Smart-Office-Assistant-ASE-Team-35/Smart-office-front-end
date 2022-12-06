@@ -68,3 +68,7 @@ h4 {
   line-height: 30px;
   color: #000;
 }
+
+.MuiModal-root {
+  overflow: auto;
+}

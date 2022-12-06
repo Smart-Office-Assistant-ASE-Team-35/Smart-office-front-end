@@ -85,43 +85,65 @@ export const EditTaskWrap = styled(Box)({
 function EditTask({
   title,
   time,
+  notify,
   paragraph,
   handleDone,
   handleEdit,
   handleDelete,
 }) {
   const [open, setOpen] = useState(false);
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-  const handleClose = () => {
-    setOpen(false);
-  };
+  const [done, setDone] = useState(false);
   return (
     <EditTaskWrap>
       <ConfirmationBox
         open={open}
-        handleClose={handleClose}
+        handleClose={() => {
+          setOpen(false);
+        }}
         handleDelete={handleDelete}
+      />
+      <ConfirmationBox
+        open={done}
+        title={"Are you sure you completed this Task"}
+        handleClose={() => {
+          setDone(false);
+        }}
+        handleDelete={handleDone}
       />
       <div className="title-wrapper">
         <h4>{title || "Project Sign"}</h4>
         <div className="edit-delete-wrap">
-          <div className="done-wrap" onClick={handleDone}>
-            <Tooltip title="Complete" placement="top">
-              <AssignmentTurnedInOutlinedIcon />
-            </Tooltip>
-          </div>
-          <div className="edit-wrap" onClick={handleEdit}>
-            <Tooltip title="Edit" placement="top">
-              <Edit />
-            </Tooltip>
-          </div>
-          <div className="delete-wrap" onClick={handleClickOpen}>
-            <Tooltip title="Delete" placement="top">
-              <DeleteOutlineOutlinedIcon />
-            </Tooltip>
-          </div>
+          {handleDone && (
+            <div
+              className="done-wrap"
+              onClick={() => {
+                setDone(true);
+              }}
+            >
+              <Tooltip title="Complete" placement="top">
+                <AssignmentTurnedInOutlinedIcon />
+              </Tooltip>
+            </div>
+          )}
+          {handleEdit && (
+            <div className="edit-wrap" onClick={handleEdit}>
+              <Tooltip title="Edit" placement="top">
+                <Edit />
+              </Tooltip>
+            </div>
+          )}
+          {handleDelete && (
+            <div
+              className="delete-wrap"
+              onClick={() => {
+                setOpen(true);
+              }}
+            >
+              <Tooltip title="Delete" placement="top">
+                <DeleteOutlineOutlinedIcon />
+              </Tooltip>
+            </div>
+          )}
         </div>
       </div>
       <div className="text-wrapper">
@@ -134,10 +156,23 @@ function EditTask({
         <Timer />
         <p>{time || "3:00PM, 12 Oct 2022"}</p>
       </div>
-      <div className="notify-wrap">
-        <NotifyIcon />
-        <p>Notified you every 2 days</p>
-      </div>
+      {handleEdit && notify && (
+        <div className="notify-wrap">
+          <NotifyIcon />
+          <p>
+            Notified you{" "}
+            {notify === "1 hour"
+              ? "Every Hour"
+              : notify === "1 day"
+              ? "Every Day"
+              : notify === "2 day"
+              ? "Every 2 Days"
+              : notify === "3 day"
+              ? "Every 3 Days"
+              : "Never"}
+          </p>
+        </div>
+      )}
     </EditTaskWrap>
   );
 }

@@ -1,1 +1,7 @@
 export const SYSTEM_NAME = "SYSTEM_NAME";
+
+export const SET_LOGIN_LOGOUT = "SET_LOGIN_LOGOUT";
+
+export const SET_NOTIFY_MESSAGE = "SET_NOTIFY_MESSAGE";
+
+export const SET_MOTIVE_QUOTE = "SET_MOTIVE_QUOTE";

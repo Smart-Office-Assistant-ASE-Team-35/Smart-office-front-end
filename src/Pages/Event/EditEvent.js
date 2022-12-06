@@ -52,34 +52,52 @@ const EventWrap = styled(Box)({
   },
 });
 
-function EditEvent({ title, time, handleEdit, handleDelete }) {
+function EditEvent({ title, time, handleEdit, handleDelete, id }) {
   const [open, setOpen] = useState(false);
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-  const handleClose = () => {
-    setOpen(false);
-  };
   return (
     <EventWrap>
-      <ConfirmationBox
-        open={open}
-        handleClose={handleClose}
-        handleDelete={handleDelete}
-      />
+      {id?.length === 43 ? (
+        <ConfirmationBox
+          open={open}
+          title={"You want to delete all repeating event"}
+          handleClose={() => {
+            handleDelete(false);
+            setOpen(false);
+          }}
+          handleDelete={() => {
+            handleDelete(true);
+            setOpen(false);
+          }}
+        />
+      ) : (
+        <ConfirmationBox
+          open={open}
+          handleClose={() => {
+            setOpen(false);
+          }}
+          handleDelete={() => {
+            handleDelete();
+            setOpen(false);
+          }}
+        />
+      )}
       <div className="title-wrapper">
-        <h4>{title || "Project Signate"}</h4>
+        <h4>{title || "Project Sign"}</h4>
         <div className="edit-delete-wrap">
-          <div className="edit-wrap" onClick={handleEdit}>
-            <Tooltip title="Edit" placement="top">
-              <Edit />
-            </Tooltip>
-          </div>
-          <div className="delete-wrap" onClick={handleClickOpen}>
-            <Tooltip title="Delete" placement="top">
-              <DeleteOutlineOutlinedIcon />
-            </Tooltip>
-          </div>
+          {handleEdit && (
+            <div className="edit-wrap" onClick={handleEdit}>
+              <Tooltip title="Edit" placement="top">
+                <Edit />
+              </Tooltip>
+            </div>
+          )}
+          {handleDelete && (
+            <div className="delete-wrap" onClick={() => setOpen(true)}>
+              <Tooltip title="Delete" placement="top">
+                <DeleteOutlineOutlinedIcon />
+              </Tooltip>
+            </div>
+          )}
         </div>
       </div>
       <div className="time-wrap">
