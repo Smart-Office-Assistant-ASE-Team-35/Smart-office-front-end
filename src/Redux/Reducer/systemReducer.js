@@ -3,6 +3,7 @@ import {
   SET_MOTIVE_QUOTE,
   SET_NOTIFY_MESSAGE,
   SYSTEM_NAME,
+  SET_SENSOR_DATA,
 } from "../ActionType/systemType";
 
 const initialState = {
@@ -10,6 +11,9 @@ const initialState = {
   isLogin: false,
   notifyMessage: "",
   motiveQuote: "",
+  doorStatus: false,
+  fireStatus: false,
+  lightValue: 0,
 };
 
 const systemReducer = (state = initialState, action) => {
@@ -34,6 +38,20 @@ const systemReducer = (state = initialState, action) => {
         ...state,
         motiveQuote: action.payload,
       };
+    case SET_SENSOR_DATA:
+      if (
+        state.doorStatus !== action.payload.doorStatus ||
+        state.fireStatus !== action.payload.fireStatus ||
+        state.lightValue !== action.payload.lightValue
+      ) {
+        return {
+          ...state,
+          doorStatus:action.payload.doorStatus,
+          fireStatus:action.payload.fireStatus,
+          lightValue:action.payload.lightValue,
+        };
+      }
+      break;
     default:
       return state;
   }
