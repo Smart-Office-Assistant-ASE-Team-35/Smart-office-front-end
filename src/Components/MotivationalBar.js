@@ -7,7 +7,7 @@ function MotivationalBar({ quote }) {
     fontStyle: "italic",
     fontWeight: "500",
     fontSize:
-      quote.length <= 50 ? "32px" : 50 < quote.length && quote.length <= 100 ? "22px" : "16px",
+      quote?.length <= 50 ? "32px" : 50 < quote?.length && quote?.length <= 100 ? "22px" : "16px",
     lineHeight: "normal",
     color: "#FFFFFF",
   };

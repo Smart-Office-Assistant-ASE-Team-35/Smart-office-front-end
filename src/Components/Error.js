@@ -3,19 +3,32 @@ import axios from "axios";
 import React from "react";
 
 function Error(props) {
+  const errorWrapperCss = {
+    position: "absolute",
+    height: "100vh",
+    width: "100vw",
+    zIndex: 1000,
+    background: "#ff0030b3",
+    display: "flex",
+    justifyContent: "center",
+    placeItems: "center",
+  }
   return (
     <div
-      style={{
-        position: "absolute",
-        height: "100vh",
-        width: "100vw",
-        zIndex: 1000,
-        background: "#ff0030b3",
-        display: "flex",
-        justifyContent: "center",
-        placeItems: "center",
+      style={props.fireSensor ? errorWrapperCss : {...errorWrapperCss,display:"none"}}
+      onMouseOver={()=>{
+        var audio = document.getElementById("audio");
+        audio.play();
       }}
     >
+      <audio
+        id="audio"
+        controls
+        autoPlay
+        style={{disply:"none"}}
+>   
+          <source src="/warnning.mp3" type="audio/mpeg"></source>
+    </audio>
       <div style={{textAlign: "center"}}>
         <h1 style={{color: "white"}}>Fire Emergency</h1>
         <br />

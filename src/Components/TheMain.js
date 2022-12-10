@@ -174,7 +174,7 @@ function TheMain() {
       createEventApi({
             ..._deadlinePayload,
           }).then((response)=>{
-
+            speak({text: `Event Created successfully.`});
           })
     }
   };
@@ -210,7 +210,7 @@ function TheMain() {
       createEventApi({
             ..._eventPayload,
           }).then((response)=>{
-
+            speak({text: `Event Created successfully.`});
           })
       
     }
@@ -218,8 +218,8 @@ function TheMain() {
   const voiceHandler = (value) => {
     try {
       if (
-        value.includes("door") &&
-        value.includes("open") || value.includes("on")&&
+        value.toLowerCase().includes("door") &&
+        (value.toLowerCase().includes("open") || value.toLowerCase().includes("on"))&&
         value.includes(systemName)
       ) {
         speak({text: "Door opend", lang: "en-IN"});
@@ -228,8 +228,8 @@ function TheMain() {
         return;
       }
       if (
-        value.includes("door") &&
-        (value.includes("close")|| value.includes("off")) &&
+        value.toLowerCase().includes("door") &&
+        (value.toLowerCase().includes("close")|| value.toLowerCase().includes("off")) &&
         value.includes(systemName)
       ) {
         speak({text: "Door Closed", lang: "en-IN"});
@@ -238,9 +238,9 @@ function TheMain() {
         return;
       }
       if (
-        value.includes("light") &&
-        value.includes("on") &&
-        value.includes(systemName)
+        value.toLowerCase().includes("light") &&
+        value.toLowerCase().includes("on") &&
+        value.toLowerCase().includes(systemName)
       ) {
         speak({text: "Lights Turn On", lang: "en-IN"});
         setLight("255")
@@ -248,9 +248,9 @@ function TheMain() {
         return;
       }
       if (
-        value.includes("light") &&
-        value.includes("off") &&
-        value.includes(systemName)
+        value.toLowerCase().includes("light") &&
+        value.toLowerCase().includes("off") &&
+        value.toLowerCase().includes(systemName)
       ) {
         speak({text: "Lights Turn OFF"});
         setLight("0")
@@ -283,7 +283,7 @@ function TheMain() {
       }
       if (
         value.includes("light") &&
-        value.includes("heigh") &&
+        value.includes("extreme") &&
         value.includes(systemName)
       ) {
         speak({text: "Lights Change to Heigh beem"});
