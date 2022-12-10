@@ -59,7 +59,7 @@ function Dashboard() {
   const getTaskData = async () => {
     let response = await getAllTask();
     let _allEvents = response?.data;
-    setAllEvents(_allEvents);
+    setAllEvents(_allEvents??[]);
     setLoader(false);
   };
 

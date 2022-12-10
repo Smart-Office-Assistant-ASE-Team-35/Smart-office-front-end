@@ -3,6 +3,7 @@ import {Box, FormControlLabel, Slider, Switch, Typography} from "@mui/material";
 import styled from "styled-components";
 import axios from "axios";
 import {setLight, setDoor} from "../../Services/service.dashboard"
+import {useSelector} from "react-redux"
 const IotWrapper = styled(Box)({});
 
 const IOSSwitch = styled((props) => (
@@ -93,8 +94,10 @@ const PretToSlider = styled(Slider)({
 });
 
 function IotSection() {
-  const [doorState, setDoorState] = useState(false);
-  const [lightIntensity, setLightIntensity] = useState(20);
+  const doorStatus = useSelector(state => state.systemReducer.doorStatus)
+  const lightValue = useSelector(state => state.systemReducer.lightValue)
+  const [lightIntensity, setLightIntensity] = useState(lightValue);
+  const [doorState, setDoorState] = useState(doorStatus);
   const handleToggle = (e) => {
     setDoorState(e.target.checked);
     if(e.target.checked){
@@ -104,41 +107,6 @@ function IotSection() {
     }
   };
   var timerState;
-  const getData = () => {
-      axios
-        .get("https://io.adafruit.com/api/v2/Dhairya_Bhatt/groups/default", {
-          headers: {
-            "X-AIO-Key": "aio_qPJU06A1oTR3zGQQSMT1oV4aHdPf",
-          },
-        })
-        .then((res) => {
-          res.data.feeds.map((sensorData) => {
-            if (sensorData.key === "door-status") {
-              if (sensorData.last_value === "0") {
-                setDoorState(false);
-              } else {
-                setDoorState(true);
-              }
-            }
-            if (sensorData.key === "office-light") {
-              if (sensorData.last_value) {
-                let intValue = parseInt(sensorData.last_value) / 2.5;
-                console.log(sensorData.last_value);
-                setLightIntensity(parseInt(intValue));
-              }
-            }
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-  };
-  useEffect(() => {
-    const interval = setInterval(() => getData(), 1200);
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
   return (
     <IotWrapper>
       <div
@@ -164,7 +132,6 @@ function IotSection() {
           />
         </div>
       </div>
-      <br />
       <Typography gutterBottom>Light Intensity :</Typography>
       <PretToSlider
         valueLabelDisplay="auto"
@@ -175,13 +142,11 @@ function IotSection() {
           setLightIntensity(event.target.value);
           clearTimeout(timerState);
           timerState = setTimeout(() => {
-            console.log(event.target.value);
             let newValue = parseInt(event.target.value*2.5)
             setLight(newValue.toString());
           }, 1000);
           
         }}
-        maxValue={255}
       />
     </IotWrapper>
   );
